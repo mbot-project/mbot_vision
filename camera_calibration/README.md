@@ -4,8 +4,9 @@
 Camera calibration scripts for MBot use.
 
 ## Installation
+To use this tool, you will need Flask, it might come with the system or you might have to install it. To check if you have flask:
 ```bash
-pip install Flask
+python -c "import flask"
 ```
 
 ## Usage and Features
@@ -19,7 +20,10 @@ To find the intrinsic matrix of the mbot camera, we need to perform the camera c
 
     Execute the following command and navigate to `http://your_mbot_ip:5001` to gather calibration images:
     ```bash
-    $ python3 save_image.py
+    # if you use nvidia jetson nano
+    $ python3 save_image_jetson.py
+    # if you use pi 5
+    $ python3 save_image_pi5.py
     ``` 
     - This will save the images in the `/images` directory for camera calibration.
     - Aim to capture images from various angles and distances for optimal results.
@@ -44,10 +48,6 @@ To find the intrinsic matrix of the mbot camera, we need to perform the camera c
 4. Verify Calibration Results
     - A "Mean reprojection error" below 0.5 indicates successful calibration, and the camera matrix is reliable.
     - If the "Mean reprojection error" is significantly above 0.5, verify the accuracy of your CHECKERBOARD dimensions and square_size settings.
-
-
-### Camera Troubleshooting
-More info about camera issues can be found [here](https://rob550-docs.github.io/docs/botlab/how-to-guide/mbot-apriltag-guide.html#camera-troubleshooting).
 
 
 ## Authors and maintainers

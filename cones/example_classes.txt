@@ -1,0 +1,5 @@
+blue_cone
+green_cone
+pink_cone
+red_cone
+yellow_cone
