@@ -1,5 +1,16 @@
 
 # Cone Detection Starter Code and Examples
+
+## 0. Dependencies
+```bash
+python3 -m venv cone_env --system-site-packages
+pip install ultralytics==8.0.200
+pip install pandas
+pip install flask
+pip install cvzone
+```
+
+
 ## 1. Required LCM Changes
    We must create a new LCM message for publishing/subscribing. <br />
    1. mbot_ws/mbot_lcm_base/mbot_lcm_serial/lcm_config.h<br />
@@ -12,7 +23,7 @@
             {
                int64_t utime;
                int32_t array_size;
-               mbot_cone_t detections[array_size]; 
+               mbot_cone_t detections[array_size];
             }
 
       b. Create: mbot_cone_t.lcm<br />
@@ -24,7 +35,7 @@
                float range;
                float heading;
             }
-         
+
    3. mbot_ws/mbot_lcm_base/mbot_msgs/CMakeLists.txt<br />
       a. To set(LCM_FILES ...) Add: lcmtypes/mbot_cone_t.lcm and lcmtypes/mbot_cone_array_t.lcm
 
