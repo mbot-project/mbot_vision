@@ -22,7 +22,7 @@ class CameraYOLO(Camera):
         # Increment frame count and check if it's time for detection
         self.frame_count += 1
         if self.frame_count % self.skip_frames == 0:
-            self.results = ncnn_model(frame)
+            self.results = self.model(frame)
 
         if not self.results:
             return frame
