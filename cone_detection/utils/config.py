@@ -11,3 +11,8 @@ TAG_CONFIG = {
     "tag_family": "tagCustom48h12",
     "skip_frames": 5             # Process every 5th frame for tag detection
 }
+
+CONE_CONFIG = {
+    "cone_base_radius": 31, # in millimeter
+    "cone_height": 80       # in millimeter  
+}

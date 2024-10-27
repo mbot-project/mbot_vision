@@ -5,8 +5,6 @@ from utils.config import CAMERA_CONFIG
 from ultralytics import YOLO
 import cv2
 """
-This script only displays the video live stream to browser.
-This is a simple program to headlessly check if the camera work.
 url: http://your_mbot_ip:5001
 """
 

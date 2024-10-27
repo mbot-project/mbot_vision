@@ -46,15 +46,3 @@ def register_signal_handlers(cleanup_function):
     atexit.register(cleanup_function)
 
 
-def retry_detection(detector, gray_frame, retries=3):
-    # prevent quit from one detection fail
-    for attempt in range(retries):
-        try:
-            return detector.detect(gray_frame)
-        except RuntimeError as e:
-            if "Unable to create" in str(e) and attempt < retries - 1:
-                print(f"Detection failed, retrying... Attempt {attempt + 1}")
-                time.sleep(0.2)
-            else:
-                raise
-    return ()  # Return an empty tuple if detection ultimately fails
