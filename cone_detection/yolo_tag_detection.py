@@ -17,13 +17,8 @@ class CameraYOLO(CameraWithAprilTag):
         self.results = None
         self.cone_base_radius = CONE_CONFIG["cone_base_radius"]
         self.cone_height = CONE_CONFIG["cone_height"]
-
-        self.cone_object_points = np.array([
-            [self.cone_base_radius, 0, 0],  # Point at base circumference
-            [-self.cone_base_radius, 0, 0], # Opposite point at base circumference
-            [0, 0, 0],                 # Center of the base
-            [0, 0, -self.cone_height]       # Apex of the cone
-        ], dtype=np.float32)
+        # Extract class names from the YOLO model
+        self.class_names = self.model.names
 
     def process_frame(self, frame):
         # Increment frame count and check if it's time for detection
@@ -34,19 +29,16 @@ class CameraYOLO(CameraWithAprilTag):
             self.detections = self.retry_detection(gray, retries=3)
             self.results = self.model(frame)
 
-        
-
         if self.results:
-            # frame = self.results[0].plot()
+            # frame = self.results[0].plot() # draw boxes, extremely slow...
             # Iterate through detections and find cones
             for detection in self.results[0].boxes:
                 class_id = int(detection.cls[0])  # Get class ID
+                class_name = self.class_names.get(class_id, "Unknown")  # Get class name from the model
+
                 # Extract bounding box coordinates
                 x_min, y_min, x_max, y_max = detection.xyxy[0]
-
-                # Calculate the coordinates for the front edge (base center of the bounding box)
-                front_x = (x_min + x_max) / 2
-                front_y = y_max  # Bottom of the bounding box
+                x_center, y_center, box_width, box_height = detection.xywh[0]
 
                 # Calculate the height of the cone in the image
                 image_cone_height = y_max - y_min
@@ -60,18 +52,43 @@ class CameraYOLO(CameraWithAprilTag):
 
                 # Calculate horizontal offset from the image center
                 image_center_x = self.camera_matrix[0, 2]
-                cone_center_x = (x_min + x_max) / 2
-                delta_x = cone_center_x - image_center_x
+                delta_x = x_center - image_center_x
 
                 # Calculate the x-distance using the focal length
                 fx = self.camera_matrix[0, 0]  # Focal length in x-direction
                 x_distance = (z_distance * delta_x) / fx
 
-                # Annotate frame with the distance information
-                distance_text = f"X: {x_distance:.2f}mm, Z: {z_distance:.2f}mm"
-                cv2.putText(frame, distance_text, (int(x_min), int(y_min) - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                # Draw the bounding box with a more visually friendly color
+                color = (0, 255, 255)  # Bright yellow color for the bounding box
+                cv2.rectangle(frame, (int(x_min), int(y_min)), (int(x_max), int(y_max)), color, 2)
 
+                # Annotate frame with the class name and distance information
+                label_y_offset = 15
+                # Use white text with a black outline for better visibility
+                text_color = (255, 255, 255)  # White text
+                outline_color = (0, 0, 0)  # Black outline
+
+                # Annotate class name
+                cv2.putText(frame, class_name, (int(x_min), int(y_min) - label_y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+                cv2.putText(frame, class_name, (int(x_min), int(y_min) - label_y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
+
+                # Annotate distance below the class name, stacked vertically
+                distance_text_x = f"X: {x_distance:.2f}mm"
+                distance_text_z = f"Z: {z_distance:.2f}mm"
+
+                # Annotate x distance
+                cv2.putText(frame, distance_text_x, (int(x_min), int(y_min) - label_y_offset - 20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+                cv2.putText(frame, distance_text_x, (int(x_min), int(y_min) - label_y_offset - 20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
+
+                # Annotate z distance
+                cv2.putText(frame, distance_text_z, (int(x_min), int(y_min) - label_y_offset - 40),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+                cv2.putText(frame, distance_text_z, (int(x_min), int(y_min) - label_y_offset - 40),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
 
         # Annotate frame if detections are present
         if self.detections:
@@ -94,6 +111,7 @@ if __name__ == '__main__':
     fps = 20
     frame_duration = int((1./fps) * 1e6)
     calibration_data = np.load('cam_calibration_data.npz')
+
     # Load a YOLO11n PyTorch model
     # model = YOLO("example_model.pt")
 

@@ -59,11 +59,15 @@ class CameraWithAprilTag(Camera):
         vertical_pos = 40 * (idx + 1)
         text = pos_text + orientation_text
 
-        # Draw the background rectangle and text
-        (text_width, text_height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-        box_coords = ((10, vertical_pos - text_height - 10), (10 + text_width, vertical_pos + baseline))
-        cv2.rectangle(frame, box_coords[0], box_coords[1], (200, 200, 200), cv2.FILLED)
-        cv2.putText(frame, text, (10, vertical_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+        # Draw text with outline
+        text_color = (255, 255, 255)  # White text
+        outline_color = (0, 0, 0)      # Black outline
+
+        # Draw the outline first (black with a slightly larger thickness)
+        cv2.putText(frame, text, (10, vertical_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)
+
+        # Draw the actual text on top (white with a smaller thickness)
+        cv2.putText(frame, text, (10, vertical_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)
 
     def decode_detection(self, detect):
         # Pose estimation for detected tag
