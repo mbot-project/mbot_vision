@@ -4,7 +4,17 @@
 # vscode cache
 */__pycache__
 
+# pip install
+*.egg-info/
+
+# camera calibration
+features/images/*.jpg
+features/cam_calibration_data.npz
+
 cone_detection/*ncnn_model
 cone_detection/utils/__pycache__
 cone_detection/example_model.torchscript
 cone_detection/cam_calibration_data.npz
+
+
+
