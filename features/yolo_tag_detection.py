@@ -1,18 +1,19 @@
 from flask import Flask, Response
-from utils.utils import register_signal_handlers
-from utils.camera_with_apriltag import CameraWithAprilTag
-from utils.config import CAMERA_CONFIG, CONE_CONFIG
 from ultralytics import YOLO
 import cv2
 import numpy as np
+
+from utils.utils import register_signal_handlers
+from utils.config import CAMERA_CONFIG, CONE_CONFIG
+from camera.camera_with_apriltag import CameraWithAprilTag
 
 """
 url: http://your_mbot_ip:5001
 """
 
 class CameraYOLO(CameraWithAprilTag):
-    def __init__(self, camera_id, width, height, calibration_data, ncnn_model, frame_duration=None):
-        super().__init__(camera_id, width, height, calibration_data, frame_duration)
+    def __init__(self, camera_id, width, height, calibration_data, ncnn_model, fps=None):
+        super().__init__(camera_id, width, height, calibration_data, fps)
         self.model = ncnn_model
         self.results = None
         self.cone_base_radius = CONE_CONFIG["cone_base_radius"]
@@ -105,23 +106,23 @@ def video():
 
 if __name__ == '__main__':
     # setup camera
-    camera_id = CAMERA_CONFIG["camera_id"]
-    image_width = CAMERA_CONFIG["image_width"]
-    image_height = CAMERA_CONFIG["image_height"]
-    fps = 20
-    frame_duration = int((1./fps) * 1e6)
+    config = CAMERA_CONFIG
+    camera_id = config["camera_id"]
+    image_width = config["image_width"]
+    image_height = config["image_height"]
+    fps = config["fps"]
     calibration_data = np.load('cam_calibration_data.npz')
 
     # Load a YOLO11n PyTorch model
-    # model = YOLO("example_model.pt")
+    # model = YOLO("../utils/cone_detection_model.pt")
 
     # Export the model to NCNN format
     # model.export(format="ncnn")
 
     # Load the exported NCNN model
-    ncnn_model = YOLO("example_model_ncnn_model")
+    ncnn_model = YOLO("../utils/cone_detection_model_ncnn_model")
 
-    camera = CameraYOLO(camera_id, image_width, image_height, calibration_data, ncnn_model, frame_duration)
+    camera = CameraYOLO(camera_id, image_width, image_height, calibration_data, ncnn_model, fps)
     register_signal_handlers(camera.cleanup)
 
     app.run(host='0.0.0.0', port=5001)

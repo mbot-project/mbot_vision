@@ -11,10 +11,21 @@
 features/images/*.jpg
 features/cam_calibration_data.npz
 
+# YOLO detection
+tests/yolo11n_ncnn_model
+tests/results.jpg
+tests/yolo11n.pt
+tests/yolo11n.torchscript
+utils/cone_detection_model_ncnn_model
+utils/cone_detection_model.torchscript
+
 cone_detection/*ncnn_model
 cone_detection/utils/__pycache__
 cone_detection/example_model.torchscript
 cone_detection/cam_calibration_data.npz
+
+
+
 
 
 

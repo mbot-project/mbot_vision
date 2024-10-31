@@ -4,11 +4,11 @@ import numpy as np
 import lcm
 from utils.config import TAG_CONFIG
 from utils.utils import rotation_matrix_to_euler_angles, rotation_matrix_to_quaternion
-from utils.camera import Camera
+from camera.camera import Camera
 
 class CameraWithAprilTag(Camera):
-    def __init__(self, camera_id, width, height, calibration_data, frame_duration=None):
-        super().__init__(camera_id, width, height, frame_duration)
+    def __init__(self, camera_id, width, height, calibration_data, fps=None):
+        super().__init__(camera_id, width, height, fps)
         config = TAG_CONFIG
         self.frame_count = 0
         self.detections = dict()
