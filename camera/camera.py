@@ -9,6 +9,11 @@ logging.basicConfig(
 )
 
 class Camera:
+    """
+    Base Camera class that provides functionality to interface with the Picamera2 camera.
+    This class handles initialization, configuration, frame capturing, and frame streaming,
+    while providing a framework for subclasses to implement custom frame processing.
+    """
     def __init__(self, camera_id, width, height, fps=None):
         """
         Initializes the camera with the given parameters.
