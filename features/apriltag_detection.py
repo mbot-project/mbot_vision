@@ -20,7 +20,6 @@ class AprilTagViewer(Camera):
     def __init__(self, camera_id, width, height, calibration_data, fps=None):
         super().__init__(camera_id, width, height, fps)
         self.tag_detector = AprilTagDetector(calibration_data)
-        time.sleep(1)
 
     def process_frame(self, frame):
         self.tag_detector.detect_tags(frame)

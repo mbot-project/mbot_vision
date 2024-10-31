@@ -4,6 +4,9 @@ from utils.config import TAG_CONFIG
 from utils.utils import rotation_matrix_to_euler_angles, rotation_matrix_to_quaternion
 import numpy as np
 import time
+import lcm
+from mbot_lcm_msgs.mbot_apriltag_array_t import mbot_apriltag_array_t
+from mbot_lcm_msgs.mbot_apriltag_t import mbot_apriltag_t
 
 class AprilTagDetector:
     """
@@ -33,6 +36,7 @@ class AprilTagDetector:
             [ self.small_tag_size/2, -self.small_tag_size/2, 0],  # Bottom-right corner
             [-self.small_tag_size/2, -self.small_tag_size/2, 0],  # Bottom-left corner
         ], dtype=np.float32)
+        self.lcm = lcm.LCM("udpm://239.255.76.67:7667?ttl=0")
 
     def detect_tags(self, frame):
         """
@@ -110,3 +114,25 @@ class AprilTagDetector:
         quaternion = rotation_matrix_to_quaternion(rotation_matrix)
 
         return tvec[0][0], tvec[1][0], tvec[2][0], roll, pitch, yaw, quaternion
+
+    def publish_apriltag(self):
+        """
+        Publish the apriltag message
+        """
+        msg = mbot_apriltag_array_t()
+        msg.array_size = len(self.detections)
+        msg.detections = []
+        if msg.array_size > 0:
+            for detection in self.detections:
+                x, y, z, roll, pitch, yaw, quaternion = self.decode_detection(detection)
+
+                apriltag = mbot_apriltag_t()
+                apriltag.tag_id = detection['id']
+                apriltag.pose.x = x
+                apriltag.pose.y = y
+                apriltag.pose.z = z
+                apriltag.pose.angles_rpy = [roll, pitch, yaw]
+                apriltag.pose.angles_quat = quaternion
+                msg.detections.append(apriltag)
+
+        self.lcm.publish("MBOT_APRILTAG_ARRAY", msg.encode())
