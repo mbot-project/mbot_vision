@@ -14,7 +14,14 @@ python3 -m pip install --upgrade pip
 pip install -e .
 ```
 
-
+### Check cone detection message use mbot lcm-spy
+```bash
+mbot lcm-spy --channels MBOT_CONE_ARRAY --module mbot_vision_lcm
+```
+### Check apriltag detection message use mbot lcm-spy
+```bash
+mbot lcm-spy --channels MBOT_APRILTAG_ARRAY
+```
 
 ### Uninstall
 ```bash
@@ -23,6 +30,11 @@ pip uninstall mbot_vision
 ### Get out of virtual env
 ```bash
 deactivate
+```
+
+## Generate LCM message
+```bash
+lcm-gen -p mbot_cone_* --ppath ..
 ```
 
 ## Dependencies

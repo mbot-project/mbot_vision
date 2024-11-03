@@ -1,0 +1,8 @@
+package mbot_vision_lcm;
+
+struct mbot_cone_t
+{
+    string name;
+    float x;
+    float z;
+}

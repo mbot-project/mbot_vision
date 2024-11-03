@@ -1,0 +1,8 @@
+package mbot_vision_lcm;
+
+struct mbot_cone_array_t
+{
+    int64_t utime;
+    int32_t array_size;
+    mbot_cone_t detections[array_size];
+}

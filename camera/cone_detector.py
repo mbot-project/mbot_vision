@@ -1,6 +1,8 @@
 import cv2
-
+import lcm
 from utils.config import CONE_CONFIG
+from mbot_vision_lcm import mbot_cone_array_t
+from mbot_vision_lcm import mbot_cone_t
 
 class ConeDetector:
     def __init__(self, model, calibration_data):
@@ -14,6 +16,7 @@ class ConeDetector:
         self.class_names = self.model.names
         self.frame_count = 0
         self.detections = []
+        self.lcm = lcm.LCM("udpm://239.255.76.67:7667?ttl=0")
 
     def detect_cones(self, frame):
         # Increment frame count and check if it's time for detection
@@ -109,3 +112,17 @@ class ConeDetector:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
 
         return frame
+
+    def publish_cones(self):
+        msg = mbot_cone_array_t()
+        msg.array_size = len(self.detections)
+        msg.detections = []
+        if msg.array_size > 0:
+            for detection in self.detections:
+                cone = mbot_cone_t()
+                cone.name = detection["class_name"]
+                cone.x = detection["x_distance"]
+                cone.z = detection["z_distance"]
+                msg.detections.append(cone)
+
+        self.lcm.publish("MBOT_CONE_ARRAY", msg.encode())
