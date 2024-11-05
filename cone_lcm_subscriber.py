@@ -1,5 +1,5 @@
 import lcm
-from mbot_vision_lcm import mbot_cone_array_t
+from mbot_lcm_msgs.mbot_cone_array_t import mbot_cone_array_t
 
 """
 This scripts subscribe to the MBOT_CONE_ARRAY
@@ -13,8 +13,8 @@ def cone_callback(channel, data):
     else:
         for detection in msg.detections:
             name = detection.name
-            x = detection.x
-            z = detection.z
+            x = detection.pose.x
+            z = detection.pose.z
             pos_text = f"{name}: x={x:.2f}, z={z:.2f}"
             print(pos_text)
 

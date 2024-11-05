@@ -1,8 +1,8 @@
 import cv2
 import lcm
 from utils.config import CONE_CONFIG
-from mbot_vision_lcm import mbot_cone_array_t
-from mbot_vision_lcm import mbot_cone_t
+from mbot_lcm_msgs.mbot_cone_array_t import mbot_cone_array_t
+from mbot_lcm_msgs.mbot_cone_t import mbot_cone_t
 
 class ConeDetector:
     def __init__(self, model, calibration_data):
@@ -121,8 +121,8 @@ class ConeDetector:
             for detection in self.detections:
                 cone = mbot_cone_t()
                 cone.name = detection["class_name"]
-                cone.x = detection["x_distance"]
-                cone.z = detection["z_distance"]
+                cone.pose.x = detection["x_distance"]
+                cone.pose.z = detection["z_distance"]
                 msg.detections.append(cone)
 
         self.lcm.publish("MBOT_CONE_ARRAY", msg.encode())
