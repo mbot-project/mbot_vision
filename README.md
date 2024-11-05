@@ -1,7 +1,7 @@
 # mbot_vision
 
 ## Description
-A collection of computer vision examples designed for MBot.
+A collection of computer vision examples designed for MBot. This is a toolbox, picl what you need. All the files under the root directory is a standalone program.
 
 ## install
 ```bash
@@ -22,18 +22,19 @@ source ~/.bashrc
 - `cone_lcm_publisher.py`, publish cone lcm message over "MBOT_CONE_ARRAY" channel
 - `cone_lcm_publisher.py`, subscribe to cone lcm message "MBOT_CONE_ARRAY" channel
 - `tag_cone_detection.py`, forward video stream to browser with apriltag and cone detection enabled
+- `tag_cone_lcm_publisher.py`, publish cone lcm message over "MBOT_CONE_ARRAY" channel, and publish apriltag lcm message over "MBOT_APRILTAG_ARRAY" channel
+- `tag_cone_lcm_subscriber.py`, as name stated, subscribe to both of the detections
 
 ## Virtual Environment
-To use this project, use venv is easier but you don't have to. But if you want to use NCNN format, then virtual env is a must.
+To use this project, use venv is easier but you don't have to.
 
 ```bash
 cd ~/mbot_ws/mbot_vision
 python3 -m venv mbot_vision_env --system-site-packages
 source mbot_vision_env/bin/activate
 python3 -m pip install --upgrade pip
+pip install ultralytics
 ```
-- `flask`, this is included when we create venv with `--system-site-packages`
-- `pip install ultralytics` Source: [Raspberry Pi with Ultralytics YOLO11](https://docs.ultralytics.com/guides/raspberry-pi/)
 
 ## Authors and maintainers
 The current maintainer of this project is Shaw Sun. Please direct all questions regarding support, contributions, and issues to the maintainer.
