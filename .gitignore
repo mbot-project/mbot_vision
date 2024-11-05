@@ -1,7 +1,6 @@
-camera_calibration/images/image*
-camera_calibration/cam_calibration_data.npz
-/yolo_env
-cone_detection/*ncnn_model
-cone_detection/utils/__pycache__
-cone_detection/example_model.torchscript
-cone_detection/cam_calibration_data.npz
+# vscode cache
+*/__pycache__
+
+# camera calibration
+images/*.jpg
+cam_calibration_data.npz
