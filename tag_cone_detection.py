@@ -45,16 +45,16 @@ if __name__ == '__main__':
 
     calibration_data = np.load('cam_calibration_data.npz')
 
-    # Load a YOLO11n PyTorch model
-    model = YOLO("utils/cone_detection_model.pt")
+    # Load a YOLO PyTorch model
+    # model = YOLO("utils/cone_detection_model.pt")
 
     # Export the model to NCNN format
     # model.export(format="ncnn")
 
     # Load the exported NCNN model
-    # ncnn_model = YOLO("utils/cone_detection_model_ncnn_model")
+    ncnn_model = YOLO("utils/cone_detection_model_ncnn_model")
 
     camera = TagConeViewer(camera_id, image_width, image_height,
-                                    model, calibration_data, fps)
+                                    ncnn_model, calibration_data, fps)
     register_signal_handlers(camera.cleanup)
     app.run(host='0.0.0.0', port=5001)

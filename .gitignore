@@ -4,6 +4,3 @@
 # camera calibration
 images/*.jpg
 cam_calibration_data.npz
-
-utils/cone_detection_model_ncnn_model
-utils/cone_detection_model.torchscript

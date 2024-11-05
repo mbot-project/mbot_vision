@@ -6,7 +6,9 @@ A collection of computer vision examples designed for MBot.
 ## install
 ```bash
 pip install ultralytics --break-system-packages
+pip install --no-cache-dir "ncnn" --break-system-packages
 echo 'export PYTHONPATH=$PYTHONPATH:/home/mbot/.local/bin' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## Files:
@@ -31,7 +33,7 @@ source mbot_vision_env/bin/activate
 python3 -m pip install --upgrade pip
 ```
 - `flask`, this is included when we create venv with `--system-site-packages`
-- `pip install ultralytics[export]` Source: [Raspberry Pi with Ultralytics YOLO11](https://docs.ultralytics.com/guides/raspberry-pi/)
+- `pip install ultralytics` Source: [Raspberry Pi with Ultralytics YOLO11](https://docs.ultralytics.com/guides/raspberry-pi/)
 
 ## Authors and maintainers
 The current maintainer of this project is Shaw Sun. Please direct all questions regarding support, contributions, and issues to the maintainer.

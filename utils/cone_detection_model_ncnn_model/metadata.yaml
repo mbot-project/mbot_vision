@@ -1,0 +1,18 @@
+description: Ultralytics cone_detection_model model trained on /content/datasets/data.yaml
+author: Ultralytics
+date: '2024-11-05T15:02:50.546710'
+version: 8.3.27
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: blue_cone
+  1: green_cone
+  2: pink_cone
+  3: red_cone
+  4: yellow_cone
