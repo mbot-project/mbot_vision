@@ -43,13 +43,13 @@ if __name__ == '__main__':
     calibration_data = np.load('cam_calibration_data.npz')
 
     # Load a YOLO PyTorch model
-    # model = YOLO("utils/cone-yolo11.pt")
+    # model = YOLO("utils/best.pt")
 
     # Export the model to NCNN format
     # model.export(format="ncnn")
 
     # Load the exported NCNN model
-    ncnn_model = YOLO("utils/cone-yolo11_ncnn_model", task='detect')
+    ncnn_model = YOLO("utils/best_ncnn_model", task='detect')
 
     camera = ConeViewer(camera_id, image_width, image_height,
                                     ncnn_model, calibration_data, fps)

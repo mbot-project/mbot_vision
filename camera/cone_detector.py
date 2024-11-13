@@ -32,6 +32,7 @@ class ConeDetector:
             for detection in self.results[0].boxes:
                 class_id = int(detection.cls[0])  # Get class ID
                 class_name = self.class_names.get(class_id, "Unknown")  # Get class name from the model
+                confidence = detection.conf[0]  # Get confidence score
 
                 # Extract bounding box coordinates
                 x_min, y_min, x_max, y_max = detection.xyxy[0]
@@ -58,6 +59,7 @@ class ConeDetector:
                 # Store detection result
                 detection_results.append({
                     "class_name": class_name,
+                    "confidence": confidence,
                     "x_min": x_min,
                     "y_min": y_min,
                     "x_max": x_max,
@@ -78,14 +80,14 @@ class ConeDetector:
             class_name = detection["class_name"]
             x_distance = detection["x_distance"]
             z_distance = detection["z_distance"]
+            confidence = detection["confidence"]
 
-            # Draw the bounding box with a more visually friendly color
+            # Draw the bounding box with a visually friendly color
             color = (0, 255, 255)  # Bright yellow color for the bounding box
             cv2.rectangle(frame, (int(x_min), int(y_min)), (int(x_max), int(y_max)), color, 2)
 
-            # Annotate frame with the class name and distance information
+            # Annotate frame with the class name, confidence, and distance information
             label_y_offset = 15
-            # Use white text with a black outline for better visibility
             text_color = (255, 255, 255)  # White text
             outline_color = (0, 0, 0)  # Black outline
 
@@ -95,20 +97,27 @@ class ConeDetector:
             cv2.putText(frame, class_name, (int(x_min), int(y_min) - label_y_offset),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
 
-            # Annotate distance below the class name, stacked vertically
+            # Annotate confidence below the class name
+            confidence_text = f"Conf: {confidence:.2f}"
+            cv2.putText(frame, confidence_text, (int(x_min), int(y_min) - label_y_offset - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+            cv2.putText(frame, confidence_text, (int(x_min), int(y_min) - label_y_offset - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
+
+            # Annotate x and z distances below confidence
             distance_text_x = f"X: {x_distance:.2f}mm"
             distance_text_z = f"Z: {z_distance:.2f}mm"
 
             # Annotate x distance
-            cv2.putText(frame, distance_text_x, (int(x_min), int(y_min) - label_y_offset - 20),
+            cv2.putText(frame, distance_text_x, (int(x_min), int(y_min) - label_y_offset - 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
-            cv2.putText(frame, distance_text_x, (int(x_min), int(y_min) - label_y_offset - 20),
+            cv2.putText(frame, distance_text_x, (int(x_min), int(y_min) - label_y_offset - 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
 
             # Annotate z distance
-            cv2.putText(frame, distance_text_z, (int(x_min), int(y_min) - label_y_offset - 40),
+            cv2.putText(frame, distance_text_z, (int(x_min), int(y_min) - label_y_offset - 60),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
-            cv2.putText(frame, distance_text_z, (int(x_min), int(y_min) - label_y_offset - 40),
+            cv2.putText(frame, distance_text_z, (int(x_min), int(y_min) - label_y_offset - 60),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
 
         return frame
