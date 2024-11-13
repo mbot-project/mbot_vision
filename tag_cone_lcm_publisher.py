@@ -18,18 +18,12 @@ if __name__ == '__main__':
 
     calibration_data = np.load('cam_calibration_data.npz')
 
-    # Load a YOLO PyTorch model
-    # model = YOLO("utils/best.pt")
-
-    # Export the model to NCNN format
-    # model.export(format="ncnn")
-
     # Load the exported NCNN model
-    ncnn_model = YOLO("utils/best_ncnn_model", task='detect')
+    model = YOLO("utils/best_ncnn_model", task='detect')
 
     camera = Camera(camera_id, image_width, image_height, fps)
     register_signal_handlers(camera.cleanup)
-    cone_detector = ConeDetector(ncnn_model, calibration_data)
+    cone_detector = ConeDetector(model, calibration_data)
     tag_detector = AprilTagDetector(calibration_data)
 
     while camera.running:
