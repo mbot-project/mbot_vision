@@ -13,7 +13,7 @@ TAG_CONFIG = {
 }
 
 CONE_CONFIG = {
-    "cone_base_radius": 31, # in millimeter
+    "cone_base_radius": 40, # in millimeter
     "cone_height": 80,      # in millimeter
     "skip_frames": 5        # Process every 5th frame for cone detection
 }
