@@ -9,9 +9,9 @@ class ConeDetector:
         self.model = model
         self.results = None
         config = CONE_CONFIG
-        self.cone_base_radius = config["cone_base_radius"]
         self.cone_height = config["cone_height"]
         self.skip_frames = config["skip_frames"]
+        self.conf_thres = config["conf_thres"]
         self.camera_matrix = calibration_data['camera_matrix']
         self.class_names = self.model.names
         self.frame_count = 0
@@ -124,14 +124,17 @@ class ConeDetector:
 
     def publish_cones(self):
         msg = mbot_cone_array_t()
-        msg.array_size = len(self.detections)
+        msg.array_size = 0
         msg.detections = []
-        if msg.array_size > 0:
+        if len(self.detections) > 0:
             for detection in self.detections:
-                cone = mbot_cone_t()
-                cone.name = detection["class_name"]
-                cone.pose.x = detection["x_distance"]
-                cone.pose.z = detection["z_distance"]
-                msg.detections.append(cone)
+                # check if the detection was false positive
+                if detection["confidence"] > self.conf_thres:
+                    cone = mbot_cone_t()
+                    cone.name = detection["class_name"]
+                    cone.pose.x = detection["x_distance"]
+                    cone.pose.z = detection["z_distance"]
+                    msg.detections.append(cone)
+                    msg.array_size += 1
 
         self.lcm.publish("MBOT_CONE_ARRAY", msg.encode())
