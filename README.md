@@ -24,6 +24,8 @@ source ~/.bashrc
 - `tag_cone_detection.py`, forward video stream to browser with apriltag and cone detection enabled
 - `tag_cone_lcm_publisher.py`, publish cone lcm message over "MBOT_CONE_ARRAY" channel, and publish apriltag lcm message over "MBOT_APRILTAG_ARRAY" channel
 - `tag_cone_lcm_subscriber.py`, as name stated, subscribe to both of the detections
+- `cone_detection_train.ipynb`, cone detection training notebook, details see comments there
+- `ncnn_model_converter.py` convert the model format to [ncnn](https://docs.ultralytics.com/integrations/ncnn/)
 
 ## Virtual Environment
 To use this project, use venv is easier but you don't have to.
