@@ -4,3 +4,6 @@
 # camera calibration
 images/*.jpg
 cam_calibration_data.npz
+
+# venv
+mbot_vision_env
