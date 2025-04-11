@@ -43,7 +43,7 @@ if __name__ == '__main__':
     calibration_data = np.load('cam_calibration_data.npz')
 
     # Load the exported NCNN model
-    model = YOLO("utils/best_ncnn_model", task='detect')
+    model = YOLO("utils/yolo11s/best_ncnn_model", task='detect')
 
     camera = ConeViewer(camera_id, image_width, image_height,
                                     model, calibration_data, fps)

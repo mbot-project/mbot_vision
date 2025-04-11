@@ -38,6 +38,16 @@ python3 -m pip install --upgrade pip
 pip install ultralytics
 pip install --no-cache-dir "ncnn"
 ```
+If using memryx: 
+- https://developer.memryx.com/get_started/install_tools.html
+- https://developer.memryx.com/get_started/install_driver.html
+```bash
+sudo apt update
+sudo apt install libhdf5-dev python3-dev cmake python3-venv build-essential
+pip3 install --upgrade pip wheel
+# The following installation process may take 10 minutes or more to complete. 
+pip3 install --extra-index-url https://developer.memryx.com/pip memryx
+```
 
 ## Authors and maintainers
 The current maintainer of this project is Shaw Sun. Please direct all questions regarding support, contributions, and issues to the maintainer.
