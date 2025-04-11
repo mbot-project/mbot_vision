@@ -83,7 +83,7 @@ class ConeDetector:
             confidence = detection["confidence"]
 
             # Skip false positive detection
-            if confidence < 0.75:
+            if confidence < self.conf_thres:
                 continue
 
             # Draw the bounding box with a visually friendly color
