@@ -36,6 +36,7 @@ python3 -m venv mbot_vision_env --system-site-packages
 source mbot_vision_env/bin/activate
 python3 -m pip install --upgrade pip
 pip install ultralytics
+pip install --no-cache-dir "ncnn"
 ```
 
 ## Authors and maintainers

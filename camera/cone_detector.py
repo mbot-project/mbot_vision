@@ -82,6 +82,10 @@ class ConeDetector:
             z_distance = detection["z_distance"]
             confidence = detection["confidence"]
 
+            # Skip false positive detection
+            if confidence < self.conf_thres:
+                continue
+
             # Draw the bounding box with a visually friendly color
             color = (0, 255, 255)  # Bright yellow color for the bounding box
             cv2.rectangle(frame, (int(x_min), int(y_min)), (int(x_max), int(y_max)), color, 2)

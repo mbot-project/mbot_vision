@@ -7,6 +7,8 @@ import time
 import lcm
 from mbot_lcm_msgs.mbot_apriltag_array_t import mbot_apriltag_array_t
 from mbot_lcm_msgs.mbot_apriltag_t import mbot_apriltag_t
+from mbot_lcm_msgs.twist2D_t import twist2D_t
+import math
 
 class AprilTagDetector:
     """
@@ -136,3 +138,37 @@ class AprilTagDetector:
                 msg.detections.append(apriltag)
 
         self.lcm.publish("MBOT_APRILTAG_ARRAY", msg.encode())
+
+    def publish_velocity_command(self, x, z):
+        """
+        Publish a velocity command based on the x and z offset of the detected tag.
+        """
+        # Constants
+        k_p = 0.002  # Proportional gain for linear velocity
+        k_theta = 1.8 # Proportional gain for angular velocity
+        z_target = 200  # Target distance (millimeters)
+
+        theta = math.atan2(x, z)  # Angle to target
+        wz = -k_theta * theta  # Angular velocity
+
+        # Modified linear velocity calculation with stop condition
+        if z - z_target > 0:
+            vx = k_p * (z - z_target)  # Move forward if target is ahead
+        else:
+            vx = 0  # Stop 
+
+        # Create the velocity command message
+        command = twist2D_t()
+        command.vx = vx
+        command.wz = wz
+        
+        # Publish the velocity command
+        self.lcm.publish("MBOT_VEL_CMD", command.encode())
+
+    def follow_apriltag(self):
+        if self.detections:
+            for detection in self.detections:
+                x, y, z, roll, pitch, yaw, quaternion = self.decode_detection(detection)
+                self.publish_velocity_command(x, z)
+        else:
+            self.publish_velocity_command(0, 0)
