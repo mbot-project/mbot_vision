@@ -1,5 +1,4 @@
 import cv2
-import lcm
 import numpy as np
 from utils.config import CONE_CONFIG
 from mbot_lcm_msgs.mbot_cone_array_t import mbot_cone_array_t
@@ -8,17 +7,12 @@ from utils.yolov8n.yolov8n_memryx import YOLOv8n
 from memryx import AsyncAccl
 
 class ConeDetectorMemryx:
-    """
-    Cone detector implementation using Memryx chip for acceleration.
-    Maintains compatibility with original ConeDetector interface.
-    """
     def __init__(self, calibration_data):
         config = CONE_CONFIG
         self.cone_height = config["cone_height"]
         self.conf_thres = config["conf_thres"]
         self.camera_matrix = calibration_data['camera_matrix']
         self.detections = []
-        self.lcm = lcm.LCM("udpm://239.255.76.67:7667?ttl=0")
 
         # Initialize YOLOv8n model
         self.model = YOLOv8n()
@@ -29,7 +23,8 @@ class ConeDetectorMemryx:
 
         # Set up callbacks
         def output_callback(*fmaps):
-            raw_dets = self.model.postprocess(fmaps)
+            raw_dets = fmaps[0]
+            #TODO: add postprocessing
             self.detections = self.cone_pose_estimate(raw_dets)
             
         self.accl.connect_output(output_callback)
