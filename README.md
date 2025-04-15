@@ -48,6 +48,11 @@ pip3 install --upgrade pip wheel
 # The following installation process may take 10 minutes or more to complete. 
 pip3 install --extra-index-url https://developer.memryx.com/pip memryx
 ```
+```bash
+sudo apt-get remove python3-matplotlib
+pip uninstall matplotlib
+pip install matplotlib==3.9.1
+```
 
 ## Authors and maintainers
 The current maintainer of this project is Shaw Sun. Please direct all questions regarding support, contributions, and issues to the maintainer.
