@@ -1,20 +1,20 @@
-[04/11/2025 02:59:19 PM][memryx.neural_compiler.nc][INFO] MemryX Neural Compiler log
-[04/11/2025 02:59:19 PM][memryx.neural_compiler.nc][INFO] Anonymous user ID: None
-[04/11/2025 02:59:19 PM][memryx.neural_compiler.nc][INFO] SDK version: 1.2.0
-[04/11/2025 02:59:19 PM][memryx.neural_compiler.nc][INFO] System info: Linux, 6.6.51+rpt-rpi-2712, aarch64, Python 3.11.2 (main, Sep 14 2024, 03:00:30) [GCC 12.2.0]
-[04/11/2025 02:59:20 PM][memryx.utilities.model_cropper][INFO] Autocrop result: {'inputs': ['/model.0/conv/Conv'], 'outputs': ['/model.22/cv2.2/cv2.2.2/Conv', '/model.22/cv3.1/cv3.1.2/Conv', '/model.22/cv3.0/cv3.0.2/Conv', '/model.22/cv2.0/cv2.0.2/Conv', '/model.22/cv3.2/cv3.2.2/Conv', '/model.22/cv2.1/cv2.1.2/Conv']}
-[04/11/2025 02:59:20 PM][memryx.utilities.model_cropper][INFO] Cropped model
-[04/11/2025 02:59:20 PM][memryx.neural_compiler.nc][INFO] Model 0 framework: onnx
-[04/11/2025 02:59:20 PM][memryx.neural_compiler.nc][INFO] Model 0 parameter count: 3006619
-[04/11/2025 02:59:20 PM][memryx.neural_compiler.nc][INFO] Model 0 input shapes: [[1, 640, 640, 3]]
-[04/11/2025 02:59:23 PM][memryx.neural_compiler.nc][INFO] Model 0 operator count: 258
-[04/11/2025 02:59:23 PM][memryx.neural_compiler.nc][INFO] Model 0 operators: {'Sigmoid': 57, 'Conv2D': 63, 'Split': 8, 'Concat': 13, 'UpSampling2D': 2, 'Input': 1, 'Output': 6, 'ZeroPadding2D': 42, 'Multiply': 57, 'Add': 6, 'MaxPooling2D': 3}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 0 input port 0: {'model_index': 0, 'layer_name': 'images', 'shape': [640, 640, 1, 3]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 1 output port 0: {'model_index': 0, 'layer_name': '/model.22/cv2.0/cv2.0.2/Conv_output_0', 'shape': [80, 80, 1, 64]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 1 output port 1: {'model_index': 0, 'layer_name': '/model.22/cv3.0/cv3.0.2/Conv_output_0', 'shape': [80, 80, 1, 5]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 1 output port 2: {'model_index': 0, 'layer_name': '/model.22/cv2.1/cv2.1.2/Conv_output_0', 'shape': [40, 40, 1, 64]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 1 output port 3: {'model_index': 0, 'layer_name': '/model.22/cv3.1/cv3.1.2/Conv_output_0', 'shape': [40, 40, 1, 5]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 1 output port 4: {'model_index': 0, 'layer_name': '/model.22/cv2.2/cv2.2.2/Conv_output_0', 'shape': [20, 20, 1, 64]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.mapper.map][INFO] MPU 1 output port 5: {'model_index': 0, 'layer_name': '/model.22/cv3.2/cv3.2.2/Conv_output_0', 'shape': [20, 20, 1, 5]}
-[04/11/2025 03:03:28 PM][memryx.neural_compiler.nc][INFO] Mapped to 2 chips of gen 3.1
-[04/11/2025 03:03:50 PM][memryx.neural_compiler.nc][INFO] Compilation successful
+[04/15/2025 09:56:07 PM][memryx.neural_compiler.nc][INFO] MemryX Neural Compiler log
+[04/15/2025 09:56:07 PM][memryx.neural_compiler.nc][INFO] Anonymous user ID: None
+[04/15/2025 09:56:07 PM][memryx.neural_compiler.nc][INFO] SDK version: 1.2.0
+[04/15/2025 09:56:07 PM][memryx.neural_compiler.nc][INFO] System info: Linux, 6.6.51+rpt-rpi-2712, aarch64, Python 3.11.2 (main, Sep 14 2024, 03:00:30) [GCC 12.2.0]
+[04/15/2025 09:56:07 PM][memryx.utilities.model_cropper][INFO] Autocrop result: {'inputs': ['/model.0/conv/Conv'], 'outputs': ['/model.22/cv2.0/cv2.0.2/Conv', '/model.22/cv3.0/cv3.0.2/Conv', '/model.22/cv2.2/cv2.2.2/Conv', '/model.22/cv3.1/cv3.1.2/Conv', '/model.22/cv3.2/cv3.2.2/Conv', '/model.22/cv2.1/cv2.1.2/Conv']}
+[04/15/2025 09:56:08 PM][memryx.utilities.model_cropper][INFO] Cropped model
+[04/15/2025 09:56:08 PM][memryx.neural_compiler.nc][INFO] Model 0 framework: onnx
+[04/15/2025 09:56:08 PM][memryx.neural_compiler.nc][INFO] Model 0 parameter count: 3006619
+[04/15/2025 09:56:08 PM][memryx.neural_compiler.nc][INFO] Model 0 input shapes: [[1, 640, 640, 3]]
+[04/15/2025 09:56:10 PM][memryx.neural_compiler.nc][INFO] Model 0 operator count: 258
+[04/15/2025 09:56:10 PM][memryx.neural_compiler.nc][INFO] Model 0 operators: {'Sigmoid': 57, 'Conv2D': 63, 'Split': 8, 'Concat': 13, 'UpSampling2D': 2, 'Input': 1, 'Output': 6, 'ZeroPadding2D': 42, 'Multiply': 57, 'Add': 6, 'MaxPooling2D': 3}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 0 input port 0: {'model_index': 0, 'layer_name': 'images', 'shape': [640, 640, 1, 3]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 3 output port 0: {'model_index': 0, 'layer_name': '/model.22/cv2.0/cv2.0.2/Conv_output_0', 'shape': [80, 80, 1, 64]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 3 output port 1: {'model_index': 0, 'layer_name': '/model.22/cv3.0/cv3.0.2/Conv_output_0', 'shape': [80, 80, 1, 5]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 3 output port 2: {'model_index': 0, 'layer_name': '/model.22/cv2.1/cv2.1.2/Conv_output_0', 'shape': [40, 40, 1, 64]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 3 output port 3: {'model_index': 0, 'layer_name': '/model.22/cv3.1/cv3.1.2/Conv_output_0', 'shape': [40, 40, 1, 5]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 3 output port 4: {'model_index': 0, 'layer_name': '/model.22/cv2.2/cv2.2.2/Conv_output_0', 'shape': [20, 20, 1, 64]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.mapper.map][INFO] MPU 3 output port 5: {'model_index': 0, 'layer_name': '/model.22/cv3.2/cv3.2.2/Conv_output_0', 'shape': [20, 20, 1, 5]}
+[04/15/2025 10:00:47 PM][memryx.neural_compiler.nc][INFO] Mapped to 4 chips of gen 3.1
+[04/15/2025 10:01:10 PM][memryx.neural_compiler.nc][INFO] Compilation successful
