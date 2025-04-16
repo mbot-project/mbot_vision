@@ -18,7 +18,7 @@ from queue import Queue, Full
 from threading import Thread
 import threading
 from memryx import MultiStreamAsyncAccl
-from .yolov8n_mx3 import YoloV8n
+from yolov8n_mx3 import YoloV8n
 from picamera2 import Picamera2
 import libcamera
 import logging
