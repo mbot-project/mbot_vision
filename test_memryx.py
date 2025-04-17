@@ -5,6 +5,9 @@ from memryx import AsyncAccl
 from utils.config import CAMERA_CONFIG
 import numpy as np
 import cv2
+import signal
+import threading
+import sys
 
 # Define class names for your cone classes
 CLASS_NAMES = [
@@ -15,6 +18,16 @@ CLASS_NAMES = [
     'yellow_cone'
 ]
 
+# Global variables for cleanup
+camera = None
+accl = None
+
+def signal_handler(signum, frame):
+    print("\nCleaning up...")
+    if camera:
+        camera.cleanup()
+    sys.exit(0)
+
 class MemryxCamera(Camera):
     def __init__(self, camera_id, width, height, model, fps=None, confidence_thres=0.8, iou_thres=0.6):
         super().__init__(camera_id, width, height, fps)
@@ -23,6 +36,7 @@ class MemryxCamera(Camera):
         self.iou_thres = iou_thres
         self.input_width = 640  # Set input width
         self.input_height = 640  # Set input height
+        self.detections = []
 
     def capture_and_preprocess(self):
         frame = self.capture_frame()
@@ -45,6 +59,9 @@ class MemryxCamera(Camera):
         Post-processes the model output using the post-processing model.
         The post-processing model handles the output transformation.
         """
+        # Clear previous detections at the start
+        self.detections = []
+        
         # Get the processed output from the post-processing model
         outputs = np.transpose(np.squeeze(mxa_output[0]))
 
@@ -58,7 +75,6 @@ class MemryxCamera(Camera):
         # Filter by confidence threshold
         mask = confidence >= self.confidence_thres
         if not np.any(mask):
-            print("No detections above confidence threshold")
             return []
             
         # Apply confidence mask
@@ -100,43 +116,57 @@ class MemryxCamera(Camera):
             if len(indices) > 0:
                 if isinstance(indices[0], list) or isinstance(indices[0], np.ndarray):
                     indices = [i[0] for i in indices]
-                final_detections = [detections[i] for i in indices]
-            else:
-                final_detections = []
-        else:
-            final_detections = []
+                self.detections = [detections[i] for i in indices]
             
         # Print final detections
         print("\nFinal Detections after NMS:")
-        for det in final_detections:
+        for det in self.detections:
             print(f"Class: {det['class']}, Score: {det['score']:.4f}, BBox: {det['bbox']}")
-            
-        return final_detections
+        return self.detections
+
+    def process_frame(self, frame):
+        """
+        Draw detections on the frame.
+        """
+        for detection in self.detections:
+            x1, y1, w, h = detection['bbox']
+            class_name = detection['class']
+            confidence = detection['score']
+
+            # Draw bounding box
+            color = (0, 255, 255)  # Yellow color for bounding box
+            cv2.rectangle(frame, (int(x1), int(y1)), (int(x1 + w), int(y1 + h)), color, 2)
+
+            # Add class label and confidence
+            label = f"{class_name} {confidence:.2f}"
+            cv2.putText(frame, label, (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+        return frame
 
 def main():
     try:
         # Connect the accelerator
         accl.connect_input(camera.capture_and_preprocess)
         accl.connect_output(camera.postprocess_and_print)
-
-        # Run the accelerator
         accl.wait()
-    except KeyboardInterrupt:
-        print("Keyboard interrupt detected. Cleaning up...")
-    finally:
-        # Cleanup
-        camera.cleanup()
-        print("Camera resources released")
+    except Exception as e:
+        print(f"Error in processing thread: {e}")
 
-# # Create Flask app
-# app = Flask(__name__)
+# Create Flask app
+app = Flask(__name__)
 
-# @app.route('/')
-# def video():
-#     return Response(camera.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/')
+def video():
+    return Response(camera.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# Update main function to run Flask app
+def flask_run():
+    app.run(host='0.0.0.0', port=5001, use_reloader=False)
+
 if __name__ == '__main__':
+    # Setup signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     # Setup camera configuration
     config = CAMERA_CONFIG
     camera_id = config["camera_id"]
@@ -153,9 +183,24 @@ if __name__ == '__main__':
 
         # Initialize camera with MemryxCamera
         camera = MemryxCamera(camera_id=camera_id, width=image_width, height=image_height, model=accl, fps=fps)
-        register_signal_handlers(camera.cleanup)
         
-        main()
+        # Start the main processing loop in a separate thread
+        processing_thread = threading.Thread(target=main)
+        processing_thread.daemon = True
+        processing_thread.start()
+        
+        # Start Flask in a separate thread
+        flask_thread = threading.Thread(target=flask_run)
+        flask_thread.daemon = True
+        flask_thread.start()
+        
+        # Keep the main thread running
+        while True:
+            threading.Event().wait(1)
+            
     except KeyboardInterrupt:
-        print("Program terminated by user")
-    # app.run(host='0.0.0.0', port=5001) 
+        print("\nShutdown requested...")
+    finally:
+        if camera:
+            camera.cleanup()
+        print("Cleanup complete") 
