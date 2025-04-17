@@ -2,7 +2,7 @@ from flask import Flask, Response
 from utils.utils import register_signal_handlers
 from camera.camera import Camera
 from memryx import AsyncAccl
-from utils.config import CAMERA_CONFIG
+from utils.config import CAMERA_CONFIG, CONE_CONFIG
 import numpy as np
 import cv2
 import signal
@@ -29,7 +29,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 class MemryxCamera(Camera):
-    def __init__(self, camera_id, width, height, model, fps=None, confidence_thres=0.8, iou_thres=0.6):
+    def __init__(self, camera_id, width, height, model, calibration_data, fps=None, confidence_thres=0.8, iou_thres=0.6):
         super().__init__(camera_id, width, height, fps)
         self.model = model
         self.confidence_thres = confidence_thres
@@ -37,6 +37,9 @@ class MemryxCamera(Camera):
         self.input_width = 640  # Set input width
         self.input_height = 640  # Set input height
         self.detections = []
+        self.camera_matrix = calibration_data['camera_matrix']
+        config = CONE_CONFIG
+        self.cone_height = config["cone_height"]
 
     def capture_and_preprocess(self):
         frame = self.capture_frame()
@@ -94,12 +97,39 @@ class MemryxCamera(Camera):
         boxes_corner[:, 3] = boxes[:, 3] * y_factor  # height
         
         # Create detection dictionaries
-        detections = [{
-            'bbox': boxes_corner[i].astype(int).tolist(),
-            'class_id': int(class_ids[i]),
-            'class': CLASS_NAMES[int(class_ids[i])],
-            'score': float(confidence[i])
-        } for i in range(len(boxes_corner))]
+        detections = []
+        for i in range(len(boxes_corner)):
+            x_min, y_min, w, h = boxes_corner[i].astype(int).tolist()
+            x_max = x_min + w
+            y_max = y_min + h
+            x_center = x_min + w / 2
+            
+            # Calculate distance using triangle similarity
+            image_cone_height = y_max - y_min
+            
+            # Calculate distance using triangle similarity
+            if image_cone_height > 0:  # Avoid division by zero
+                focal_length = self.camera_matrix[1, 1]  # Approximate focal length from calibration data
+                z_distance = (focal_length * self.cone_height) / image_cone_height
+            else:
+                z_distance = -1  # Error indicator
+
+            # Calculate horizontal offset from the image center
+            image_center_x = self.camera_matrix[0, 2]
+            delta_x = x_center - image_center_x
+
+            # Calculate the x-distance using the focal length
+            fx = self.camera_matrix[0, 0]  # Focal length in x-direction
+            x_distance = (z_distance * delta_x) / fx
+            
+            detections.append({
+                'bbox': [x_min, y_min, w, h],
+                'class_id': int(class_ids[i]),
+                'class': CLASS_NAMES[int(class_ids[i])],
+                'score': float(confidence[i]),
+                'x_distance': x_distance,
+                'z_distance': z_distance
+            })
         
         # Apply NMS
         if detections:
@@ -132,14 +162,46 @@ class MemryxCamera(Camera):
             x1, y1, w, h = detection['bbox']
             class_name = detection['class']
             confidence = detection['score']
+            x_distance = detection['x_distance']
+            z_distance = detection['z_distance']
 
             # Draw bounding box
             color = (0, 255, 255)  # Yellow color for bounding box
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x1 + w), int(y1 + h)), color, 2)
 
-            # Add class label and confidence
-            label = f"{class_name} {confidence:.2f}"
-            cv2.putText(frame, label, (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            # Annotate frame with class name, confidence, and distance information
+            label_y_offset = 15
+            text_color = (255, 255, 255)  # White text
+            outline_color = (0, 0, 0)  # Black outline
+
+            # Annotate class name
+            cv2.putText(frame, class_name, (int(x1), int(y1) - label_y_offset),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+            cv2.putText(frame, class_name, (int(x1), int(y1) - label_y_offset),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
+
+            # Annotate confidence below the class name
+            confidence_text = f"Conf: {confidence:.2f}"
+            cv2.putText(frame, confidence_text, (int(x1), int(y1) - label_y_offset - 20),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+            cv2.putText(frame, confidence_text, (int(x1), int(y1) - label_y_offset - 20),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
+
+            # Annotate x and z distances below confidence
+            distance_text_x = f"X: {x_distance:.2f}mm"
+            distance_text_z = f"Z: {z_distance:.2f}mm"
+
+            # Annotate x distance
+            cv2.putText(frame, distance_text_x, (int(x1), int(y1) - label_y_offset - 40),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+            cv2.putText(frame, distance_text_x, (int(x1), int(y1) - label_y_offset - 40),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
+
+            # Annotate z distance
+            cv2.putText(frame, distance_text_z, (int(x1), int(y1) - label_y_offset - 60),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, outline_color, 3)  # Outline
+            cv2.putText(frame, distance_text_z, (int(x1), int(y1) - label_y_offset - 60),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 2)  # Text
 
         return frame
 
@@ -173,6 +235,9 @@ if __name__ == '__main__':
     image_width = config["image_width"]
     image_height = config["image_height"]
     fps = config["fps"]
+    
+    # Load calibration data
+    calibration_data = np.load('cam_calibration_data.npz')
 
     try:
         # Initialize MemryX accelerator
@@ -182,7 +247,7 @@ if __name__ == '__main__':
         accl.set_postprocessing_model('utils/yolov8n/best_v8n_post.onnx')
 
         # Initialize camera with MemryxCamera
-        camera = MemryxCamera(camera_id=camera_id, width=image_width, height=image_height, model=accl, fps=fps)
+        camera = MemryxCamera(camera_id=camera_id, width=image_width, height=image_height, model=accl, calibration_data=calibration_data, fps=fps)
         
         # Start the main processing loop in a separate thread
         processing_thread = threading.Thread(target=main)
