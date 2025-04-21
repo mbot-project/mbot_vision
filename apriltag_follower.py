@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from flask import Flask, Response
 import numpy as np
+import threading
 
 from utils.utils import register_signal_handlers
 from utils.config import CAMERA_CONFIG
@@ -19,18 +20,24 @@ class AprilTagViewer(Camera):
     def __init__(self, camera_id, width, height, calibration_data, fps=None):
         super().__init__(camera_id, width, height, fps)
         self.tag_detector = AprilTagDetector(calibration_data)
+        self.latest_frame = None
 
     def process_frame(self, frame):
-        self.tag_detector.detect_tags(frame)
         self.tag_detector.draw_tags(frame)
-        self.tag_detector.follow_apriltag()
-
         return frame
 
 app = Flask(__name__)
 @app.route('/')
 def video():
     return Response(camera.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+# Processing thread function
+def detection_thread():
+    while camera.running:
+        frame = camera.capture_frame()
+        camera.tag_detector.detect_tags(frame)
+        camera.tag_detector.follow_apriltag()
+        camera.latest_frame = frame  # Store processed frame
     
 if __name__ == '__main__':
     # setup camera
@@ -50,4 +57,17 @@ if __name__ == '__main__':
         camera.cleanup()
     
     register_signal_handlers(follower_cleanup)
-    app.run(host='0.0.0.0', port=5001)
+    
+    # Start detection in separate thread
+    processing_thread = threading.Thread(target=detection_thread)
+    processing_thread.daemon = True
+    processing_thread.start()
+    
+    # Start Flask in a separate thread
+    flask_thread = threading.Thread(target=lambda: app.run(host='0.0.0.0', port=5001))
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    # Keep main thread alive
+    while True:
+        threading.Event().wait(1)

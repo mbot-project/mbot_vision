@@ -3,6 +3,7 @@ from utils.utils import register_signal_handlers
 from camera.camera import Camera
 from memryx import AsyncAccl
 from utils.config import CAMERA_CONFIG, CONE_CONFIG
+from utils.metrics_logger import MetricsLogger
 import numpy as np
 import cv2
 import signal
@@ -21,6 +22,7 @@ CLASS_NAMES = [
 # Global variables for cleanup
 camera = None
 accl = None
+metrics_logger = None
 
 def signal_handler(signum, frame):
     print("\nCleaning up...")
@@ -205,6 +207,14 @@ class MemryxCamera(Camera):
 
         return frame
 
+def record_metrics():
+    """
+    Record system metrics including FPS, CPU, and memory usage
+    """
+    if camera and metrics_logger:
+        fps = camera.measured_fps
+        metrics_logger.log_metrics(fps)
+
 def main():
     try:
         # Connect the accelerator
@@ -236,6 +246,9 @@ if __name__ == '__main__':
     image_height = config["image_height"]
     fps = config["fps"]
     
+    # Initialize metrics logger
+    metrics_logger = MetricsLogger()
+    
     # Load calibration data
     calibration_data = np.load('cam_calibration_data.npz')
 
@@ -259,8 +272,9 @@ if __name__ == '__main__':
         flask_thread.daemon = True
         flask_thread.start()
         
-        # Keep the main thread running
+        # Keep the main thread running and record metrics
         while True:
+            record_metrics()
             threading.Event().wait(1)
             
     except KeyboardInterrupt:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from flask import Flask, Response
 import numpy as np
+import threading
 from ultralytics import YOLO
 
 from utils.utils import register_signal_handlers
@@ -23,17 +24,21 @@ class TagConeViewer(Camera):
         self.tag_detector = AprilTagDetector(calibration_data)
 
     def process_frame(self, frame):
-        self.cone_detector.detect_cones(frame)
         self.cone_detector.draw_cone_detect(frame)
-        self.tag_detector.detect_tags(frame)
         self.tag_detector.draw_tags(frame)
-
         return frame
 
 app = Flask(__name__)
 @app.route('/')
 def video():
     return Response(camera.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+# Processing thread function
+def detection_thread():
+    while camera.running:
+        frame = camera.capture_frame()
+        camera.cone_detector.detect_cones(frame)
+        camera.tag_detector.detect_tags(frame)
 
 if __name__ == '__main__':
     # setup camera
@@ -51,4 +56,17 @@ if __name__ == '__main__':
     camera = TagConeViewer(camera_id, image_width, image_height,
                                     model, calibration_data, fps)
     register_signal_handlers(camera.cleanup)
-    app.run(host='0.0.0.0', port=5001)
+    
+    # Start detection in separate thread
+    processing_thread = threading.Thread(target=detection_thread)
+    processing_thread.daemon = True
+    processing_thread.start()
+    
+    # Start Flask in a separate thread
+    flask_thread = threading.Thread(target=lambda: app.run(host='0.0.0.0', port=5001))
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    # Keep main thread alive
+    while True:
+        threading.Event().wait(1)

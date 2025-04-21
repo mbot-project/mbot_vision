@@ -2,6 +2,7 @@ from picamera2 import Picamera2
 import libcamera
 import logging
 import cv2
+import time
 
 logging.basicConfig(
     level=logging.INFO,  # Set to DEBUG for more verbosity during development
@@ -33,7 +34,21 @@ class Camera:
         self.cap.configure(config)
         self.cap.start()
         self.running = True
+        
+        # FPS tracking variables
+        self.measured_fps = 0
+        self.frame_time = time.time()
+        self.frame_count = 0
+        self.fps_update_interval = 1.0  # Update FPS every second
+        
         logging.info("Camera initialized.")
+
+    def get_fps(self):
+        """
+        Returns the current measured FPS.
+        :return: Current frames per second measurement.
+        """
+        return self.measured_fps
 
     def capture_frame(self):
         """
@@ -48,6 +63,15 @@ class Camera:
         :return: A generator yielding encoded frames.
         """
         while self.running:
+            # Update FPS calculation
+            current_time = time.time()
+            self.frame_count += 1
+            
+            if current_time - self.frame_time >= self.fps_update_interval:
+                self.measured_fps = self.frame_count / (current_time - self.frame_time)
+                self.frame_count = 0
+                self.frame_time = current_time
+            
             # Capture the frame
             frame = self.capture_frame()
 
