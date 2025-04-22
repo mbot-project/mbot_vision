@@ -49,9 +49,15 @@ pip3 install --upgrade pip wheel
 pip3 install --extra-index-url https://developer.memryx.com/pip memryx
 ```
 ```bash
+# maybe we don't need this?...
 sudo apt-get remove python3-matplotlib
 pip uninstall matplotlib
 pip install matplotlib==3.9.1
+```
+```bash
+pip install matplotlib
+pip install pandas
+pip install seaborn
 ```
 
 ## Authors and maintainers
