@@ -246,9 +246,6 @@ if __name__ == '__main__':
     image_height = config["image_height"]
     fps = config["fps"]
     
-    # Initialize metrics logger
-    metrics_logger = MetricsLogger()
-    
     # Load calibration data
     calibration_data = np.load('cam_calibration_data.npz')
 
@@ -272,6 +269,9 @@ if __name__ == '__main__':
         flask_thread.daemon = True
         flask_thread.start()
         
+        # Initialize metrics logger
+        metrics_logger = MetricsLogger()
+
         # Keep the main thread running and record metrics
         while True:
             record_metrics()

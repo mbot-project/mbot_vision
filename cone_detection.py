@@ -53,9 +53,6 @@ if __name__ == '__main__':
     image_height = config["image_height"]
     fps = config["fps"]
 
-    # Initialize metrics logger
-    metrics_logger = MetricsLogger()
-
     calibration_data = np.load('cam_calibration_data.npz')
 
     # Load the exported NCNN model
@@ -75,6 +72,9 @@ if __name__ == '__main__':
     flask_thread.daemon = True
     flask_thread.start()
     
+    # Initialize metrics logger
+    metrics_logger = MetricsLogger()
+ 
     # Keep main thread alive and record metrics every second
     while True:
         record_metrics()
