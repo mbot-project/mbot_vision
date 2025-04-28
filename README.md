@@ -4,11 +4,25 @@
 A collection of computer vision examples designed for MBot. This is a toolbox, picl what you need. All the files under the root directory is a standalone program.
 
 ## install
+Follow instructions [here](https://rob550-docs.github.io/docs/botlab/how-to-guide/mbot-vision-guide.html).
+
+## Virtual Environment
+To use this project, use venv is easier but you don't have to.
+
 ```bash
-pip install ultralytics --break-system-packages
-pip install --no-cache-dir "ncnn" --break-system-packages
-echo 'export PYTHONPATH=$PYTHONPATH:/home/mbot/.local/bin' >> ~/.bashrc
-source ~/.bashrc
+cd ~/mbot_ws/mbot_vision
+python3 -m venv mbot_vision_env --system-site-packages
+source mbot_vision_env/bin/activate
+python3 -m pip install --upgrade pip
+pip install ultralytics
+pip install --no-cache-dir "ncnn"
+```
+
+```bash
+# if use logger
+pip install matplotlib
+pip install pandas
+pip install seaborn
 ```
 
 ## Files:
@@ -26,39 +40,6 @@ source ~/.bashrc
 - `tag_cone_lcm_subscriber.py`, as name stated, subscribe to both of the detections
 - `cone_detection_train.ipynb`, cone detection training notebook, details see comments there
 - `ncnn_model_converter.py` convert the model format to [ncnn](https://docs.ultralytics.com/integrations/ncnn/)
-
-## Virtual Environment
-To use this project, use venv is easier but you don't have to.
-
-```bash
-cd ~/mbot_ws/mbot_vision
-python3 -m venv mbot_vision_env --system-site-packages
-source mbot_vision_env/bin/activate
-python3 -m pip install --upgrade pip
-pip install ultralytics
-pip install --no-cache-dir "ncnn"
-```
-If using memryx: 
-- https://developer.memryx.com/get_started/install_tools.html
-- https://developer.memryx.com/get_started/install_driver.html
-```bash
-sudo apt update
-sudo apt install libhdf5-dev python3-dev cmake python3-venv build-essential
-pip3 install --upgrade pip wheel
-# The following installation process may take 10 minutes or more to complete. 
-pip3 install --extra-index-url https://developer.memryx.com/pip memryx
-```
-```bash
-# maybe we don't need this?...
-sudo apt-get remove python3-matplotlib
-pip uninstall matplotlib
-pip install matplotlib==3.9.1
-```
-```bash
-pip install matplotlib
-pip install pandas
-pip install seaborn
-```
 
 ## Authors and maintainers
 The current maintainer of this project is Shaw Sun. Please direct all questions regarding support, contributions, and issues to the maintainer.
