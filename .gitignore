@@ -1,6 +1,5 @@
 # vscode cache
 */__pycache__
-utils/yolov8n/__pycache__/*
 
 # camera calibration
 images/*.jpg
