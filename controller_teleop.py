@@ -14,8 +14,8 @@ class GamepadTeleop:
         self.lcm = lcm.LCM("udpm://239.255.76.67:7667?ttl=0")
         
         # Controller settings
-        self.max_linear_velocity = 0.2  # meters per second
-        self.max_angular_velocity = 1  # radians per second
+        self.max_linear_velocity = 0.18  # meters per second
+        self.max_angular_velocity = 0.8  # radians per second
         
         # Check for joystick
         if pygame.joystick.get_count() == 0:

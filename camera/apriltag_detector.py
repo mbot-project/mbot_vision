@@ -187,7 +187,7 @@ class AprilTagDetector:
         k_center = 0.8  # Additional gain for centering
         z_target = 250  # Target distance (millimeters)
         backup_threshold = 200  # Distance threshold to start backing up
-        max_linear_speed = 0.15  # Maximum linear speed
+        max_linear_speed = 0.18  # Maximum linear speed
         max_reverse_speed = 0.12  # Maximum reverse speed
         min_linear_speed = 0.03  # Minimum forward speed when following
         max_angular_speed = 1.2  # Increased maximum angular speed
