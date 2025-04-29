@@ -41,5 +41,15 @@ pip install seaborn
 - `cone_detection_train.ipynb`, cone detection training notebook, details see comments there
 - `ncnn_model_converter.py` convert the model format to [ncnn](https://docs.ultralytics.com/integrations/ncnn/)
 
+
+## How to create system service for teleop
+```bash
+chmod +x controller_teleop.py
+sudo cp ~/mbot_ws/mbot_vision/services/mbot_teleop.service /etc/systemd/system/ 
+sudo systemctl daemon-reload 
+sudo systemctl enable mbot_teleop.service
+sudo systemctl start mbot_teleop.service
+```
+
 ## Authors and maintainers
 The current maintainer of this project is Shaw Sun. Please direct all questions regarding support, contributions, and issues to the maintainer.

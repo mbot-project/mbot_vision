@@ -139,36 +139,98 @@ class AprilTagDetector:
 
         self.lcm.publish("MBOT_APRILTAG_ARRAY", msg.encode())
 
+    def follow_apriltag(self):
+        """
+        Follow the closest AprilTag detected by the camera.
+        When no tag is detected, the robot will stop.
+        """
+        if self.detections:
+            closest_tag = None
+            min_z = float('inf')
+            
+            # Find the closest tag
+            for detection in self.detections:
+                x, y, z, roll, pitch, yaw, quaternion = self.decode_detection(detection)
+                if z < min_z:
+                    min_z = z
+                    closest_tag = (x, z)
+            
+
+            x, z = closest_tag
+            self.publish_velocity_command(x, z)
+        else:
+            # No detections - explicitly send a stop command
+            self.stop_robot()
+    
+    def stop_robot(self):
+        """
+        Send a command to stop the robot completely.
+        """
+        command = twist2D_t()
+        command.vx = 0.0
+        command.wz = 0.0
+        self.lcm.publish("MBOT_VEL_CMD", command.encode())
+
     def publish_velocity_command(self, x, z):
         """
         Publish a velocity command based on the x and z offset of the detected tag.
         """
+        # Safety check - if z is very small or zero, stop the robot
+        if z < 1.0:  # Unrealistically close or invalid measurement
+            self.stop_robot()
+            return
+            
         # Constants
-        k_p = 0.002  # Proportional gain for linear velocity
-        k_theta = 1.8 # Proportional gain for angular velocity
-        z_target = 200  # Target distance (millimeters)
-
+        k_p = 0.002  # Reduced proportional gain for linear velocity
+        k_p_reverse = 0.002  # Higher gain for backing up (more responsive)
+        k_theta = 2.0  # Increased angular gain for faster turning
+        k_center = 0.8  # Additional gain for centering
+        z_target = 250  # Target distance (millimeters)
+        backup_threshold = 200  # Distance threshold to start backing up
+        max_linear_speed = 0.15  # Maximum linear speed
+        max_reverse_speed = 0.12  # Maximum reverse speed
+        min_linear_speed = 0.03  # Minimum forward speed when following
+        max_angular_speed = 1.2  # Increased maximum angular speed
+        
+        # Calculate angle to target with stronger centering bias
         theta = math.atan2(x, z)  # Angle to target
-        wz = -k_theta * theta  # Angular velocity
-
-        # Modified linear velocity calculation with stop condition
-        if z - z_target > 0:
-            vx = k_p * (z - z_target)  # Move forward if target is ahead
+        
+        # Add extra centering component - this increases turning when off-center
+        centering_factor = k_center * (x / (z + 100))  # Normalized lateral offset
+        wz = -k_theta * (theta + centering_factor)  # Angular velocity with centering bias
+        
+        # Limit angular velocity
+        wz = max(min(wz, max_angular_speed), -max_angular_speed)
+        
+        # Calculate linear velocity based on distance to target
+        if z > z_target:
+            # Go forward when target is too far
+            error = z - z_target
+            vx = k_p * error
+            
+            # Reduce speed when turning sharply or when far off-center
+            turn_factor = 1.0 - (min(abs(wz), max_angular_speed) / max_angular_speed) * 0.7
+            center_factor = 1.0 - min(abs(x) / 100, 0.5)  # Reduce speed more when off-center
+            vx = vx * turn_factor * center_factor
+            
+            # Apply limits
+            vx = max(min(vx, max_linear_speed), min_linear_speed)
+        elif z < backup_threshold:
+            # Back up when too close
+            error = backup_threshold - z
+            vx = -k_p_reverse * error  # Negative velocity for backing up
+            
+            # Apply reverse speed limit
+            vx = max(-max_reverse_speed, vx)
         else:
-            vx = 0  # Stop 
+            # In the "dead zone" between backup_threshold and z_target
+            if z > backup_threshold * 0.7:
+                vx = min_linear_speed * 0.5  # Crawl forward slowly
+            else:
+                vx = 0  # Stop if in the middle of the "dead zone"
 
-        # Create the velocity command message
+        # Create and publish the velocity command
         command = twist2D_t()
         command.vx = vx
         command.wz = wz
-        
-        # Publish the velocity command
         self.lcm.publish("MBOT_VEL_CMD", command.encode())
-
-    def follow_apriltag(self):
-        if self.detections:
-            for detection in self.detections:
-                x, y, z, roll, pitch, yaw, quaternion = self.decode_detection(detection)
-                self.publish_velocity_command(x, z)
-        else:
-            self.publish_velocity_command(0, 0)

@@ -1,0 +1,14 @@
+[Unit]
+Description=MBot Gamepad Teleop Service
+After=network.target
+
+[Service]
+Type=simple
+User=mbot
+WorkingDirectory=/home/mbot/mbot_ws/mbot_vision
+ExecStart=/usr/bin/python3 /home/mbot/mbot_ws/mbot_vision/controller_teleop.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target 
