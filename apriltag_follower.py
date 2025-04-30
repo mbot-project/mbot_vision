@@ -53,7 +53,7 @@ if __name__ == '__main__':
                                       calibration_data, fps)
     
     def follower_cleanup():
-        camera.tag_detector.publish_velocity_command(0, 0)
+        camera.tag_detector.stop_robot()
         camera.cleanup()
     
     register_signal_handlers(follower_cleanup)
