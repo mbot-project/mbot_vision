@@ -95,6 +95,7 @@ class GamepadTeleop:
             
             while True:
                 # Handle events
+                pygame.event.pump()
                 for event in pygame.event.get():
                     if event.type == pygame.JOYAXISMOTION:
                         print(f"\nRaw joystick axes values:")
