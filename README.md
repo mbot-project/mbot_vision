@@ -82,6 +82,17 @@ Control scheme:
 If the leader robot doesn't move:
 1. The controller is not ON
 2. The control board lost connection, press the RST button on it to reboot the control board
+
+If the follower robot doesn't move:
+1. The control board lost connection, press the RST button on it to reboot the control board
+
+
+In depth debug:
+```bash
+sudo systemctl status mbot-follower.service
+# OR
+sudo journalctl -fu mbot-follower.service
+```
 ## Use Case 3 - Development
 ### Virtual Environment
 To use this project, use venv is recommended
