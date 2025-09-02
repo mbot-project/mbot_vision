@@ -78,6 +78,10 @@ Control scheme:
   - Right shoulder buttons (R1/R2): Increase/decrease max angular speed
   - Default max linear speed: 0.10 m/s
   - Default max angular speed: 0.50 rad/s
+
+If the leader robot doesn't move:
+1. The controller is not ON
+2. The control board lost connection, press the RST button on it to reboot the control board
 ## Use Case 3 - Development
 ### Virtual Environment
 To use this project, use venv is recommended
