@@ -1,5 +1,5 @@
 [Unit]
-Description=MBot Gamepad Teleop Service
+Description=MBot Follow Service
 After=network.target
 
 [Service]
