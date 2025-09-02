@@ -6,6 +6,7 @@ After=network.target
 Type=simple
 User=mbot
 WorkingDirectory=/home/mbot/mbot_ws/mbot_vision
+Environment=PYTHONPATH=/usr/local/lib/python3.11/site-packages:/usr/local/lib/python3/dist-packages
 ExecStart=/usr/bin/python3 /home/mbot/mbot_ws/mbot_vision/apriltag_follower.py
 Restart=on-failure
 RestartSec=5
